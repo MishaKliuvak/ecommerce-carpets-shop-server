@@ -25,3 +25,22 @@ exports.listAll = async (req, res) => {
     .exec()
   res.json(products)
 }
+
+exports.remove = async (req, res) => {
+  try {
+    const deletedProduct = await Product.findOneAndRemove({ slug: req.params.slug }).exec()
+
+    res.json(deletedProduct)
+  } catch (err) {
+    console.log(err)
+    return res.status(400).message('Product delete failed')
+  }
+}
+
+exports.read = async (req, res) => {
+  let product = await Product.findOne({ slug: req.params.slug })
+    .populate('category')
+    .populate('subs')
+    .exec()
+  res.json(product)
+}
