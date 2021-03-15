@@ -7,16 +7,20 @@ cloudinary.config({
 })
 
 exports.upload = async (req, res) => {
-  let result = await cloudinary.uploader.upload(req.body.image, {
-    public_id: `${Date.now()}`,
-    resource_type: 'auto',
+  try {
+    let result = await cloudinary.uploader.upload(req.body.image, {
+      public_id: `${Date.now()}`,
+      resource_type: 'auto',
 
-  })
+    })
 
-  res.json({
-    public_id: result.public_id,
-    url: result.secure_url
-  })
+    res.json({
+      public_id: result.public_id,
+      url: result.secure_url
+    })
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 exports.remove = async (req, res) => {
