@@ -60,3 +60,59 @@ exports.update = async (req, res) => {
     })
   }
 }
+
+exports.list = async (req, res) => {
+  try {
+    const { sort, order, page } = req.body
+
+    const currentPage = page || 1
+    const perPage = 3
+
+    const products = await Product.find({ })
+      .skip((currentPage - 1) * perPage)
+      .populate('category')
+      .populate('subs')
+      .sort([[sort, order]])
+      .limit(perPage)
+      .exec()
+
+    res.json(products)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({
+      err: err.message
+    })
+  }
+}
+
+exports.productsCount = async (req, res) => {
+  let total = await Product.find({}).estimatedDocumentCount().exec()
+  res.json(total)
+}
+
+exports.updateRating = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec()
+  const user = await User.findOne({ email: req.user.email }).exec()
+
+  const { star } = req.body
+
+  let existingRatingObj = product.ratings.find((item) => item.postedBy.toString() === user._id.toString())
+
+  if (existingRatingObj === undefined) {
+    let ratingAdded = await Product.findByIdAndUpdate(product._id, {
+      $push: { ratings: { star, postedBy: user._id } }
+    }, { new: true }).exec()
+    console.log(ratingAdded)
+
+    res.json(ratingAdded)
+  } else {
+    const ratingUpdated = await Product.updateOne(
+      { ratings: { $elemMatch: existingRatingObj } },
+      { $set: { "ratings.$.star": star } },
+      { new: true}
+    ).exec()
+
+    console.log(ratingUpdated)
+    res.json(ratingUpdated)
+  }
+}
