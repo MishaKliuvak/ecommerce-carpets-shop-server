@@ -14,7 +14,12 @@ exports.create = async (req, res) => {
 
 exports.read = async (req, res) => {
   let sub = await Sub.findOne({ slug: req.params.slug }).exec()
-  res.json(sub)
+
+  const products = await Product.find({ subs: sub })
+    .populate('subs')
+    .exec()
+
+  res.json({ sub, products })
 }
 
 exports.list = async (req, res) => {
