@@ -10,7 +10,6 @@ exports.create = async (req, res) => {
 
     res.json(newProduct)
   } catch (err) {
-    //res.status(400).send('Create product failed: ' + err.message)
     res.status(400).json({
       err: err.message
     })
@@ -131,3 +130,44 @@ exports.listRelated = async (req, res) => {
   res.json(related)
 }
 
+// Search
+const handleQuery = async (req, res, query) => {
+  const products = await Product.find({ $text: { $search: query } })
+    .populate('category', '_id name')
+    .populate('subs', '_id name')
+    .exec()
+
+  res.json(products)
+}
+
+const handlePrice = async (req, res, price) => {
+  try {
+    let products = await Product.find({
+      price: {
+        $gte: price[0],
+        $lte: price[1]
+      }
+    })
+      .populate('category', '_id name')
+      .populate('subs', '_id name')
+      .exec()
+
+    res.json(products)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+exports.searchFilters = async (req, res) => {
+  const { query, price } = req.body
+
+  if (query) {
+    console.log(query)
+    await handleQuery(req, res, query)
+  }
+
+  if (price !== undefined) {
+    console.log(price)
+    await handlePrice(req, res, price)
+  }
+}
