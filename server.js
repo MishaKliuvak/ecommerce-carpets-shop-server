@@ -12,9 +12,10 @@ const app = express()
 // DB
 mongoose
     .connect(process.env.DATABASE, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: true
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useFindAndModify: true,
+        useUnifiedTopology: true
     })
     .then(() => {
         console.log('Connected to DB');
