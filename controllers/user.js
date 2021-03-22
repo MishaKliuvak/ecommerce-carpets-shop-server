@@ -71,7 +71,8 @@ exports.saveAddress = async (req, res) => {
 exports.applyCoupon = async (req, res) => {
   const { coupon } = req.body
 
-  const validCoupon = await Coupon.findOne({ name: coupon.name }).exec()
+  console.log(coupon)
+  const validCoupon = await Coupon.findOne({ name: coupon }).exec()
   if (validCoupon === null) {
     return res.json({
       err: 'Not found coupon'
