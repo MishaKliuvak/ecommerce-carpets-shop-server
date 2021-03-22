@@ -1,6 +1,7 @@
 const User = require('../models/user')
 const Product = require('../models/product')
 const Cart = require('../models/cart')
+const Coupon = require('../models/coupon')
 
 exports.userCart = async (req, res) => {
   const { cart } = req.body
@@ -65,4 +66,26 @@ exports.saveAddress = async (req, res) => {
     .exec()
 
   res.json({ ok: 'true' })
+}
+
+exports.applyCoupon = async (req, res) => {
+  const { coupon } = req.body
+
+  const validCoupon = await Coupon.findOne({ name: coupon.name }).exec()
+  if (validCoupon === null) {
+    return res.json({
+      err: 'Not found coupon'
+    })
+  }
+
+  const user = await User.findOne({ email: req.user.email }).exec()
+  let { products, cartTotal } = await Cart.findOne({ orderedBy: user._id})
+    .populate('products.product', '_id title price')
+    .exec()
+
+  let totalAfterDiscount = (cartTotal - (cartTotal * validCoupon.discount / 100)).toFixed(2)
+
+  await Cart.findOneAndUpdate({ orderedBy: user._id }, { totalAfterDiscount }, { new: true }).exec()
+
+  res.json(totalAfterDiscount)
 }
