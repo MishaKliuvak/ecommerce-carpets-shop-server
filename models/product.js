@@ -6,7 +6,6 @@ const productSchema = new mongoose.Schema({
     type: String,
     trim: true,
     required: true,
-    maxlength: 32,
     text: true
   },
   slug: {
@@ -19,14 +18,12 @@ const productSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
-    maxlength: 2000,
     text: true
   },
   price: {
     type: Number,
     trim: true,
-    required: true,
-    maxlength: 32
+    required: true
   },
   category: {
     type: ObjectId,
@@ -58,7 +55,7 @@ const productSchema = new mongoose.Schema({
   },
   brand: {
     type: String,
-    enum: ['Apple', 'Samsung', 'Microsoft', 'Lenovo', 'Asus']
+    enum: ['IKEA', 'Karat', 'AW', 'ITC', 'Ideal', 'Kartal', 'Looshchoow', 'Penny', 'Sanat', 'Киевгума', 'Лущув']
   },
   ratings: [
     {
@@ -66,6 +63,10 @@ const productSchema = new mongoose.Schema({
       postedBy: {
         type: ObjectId,
         ref: 'User'
+      },
+      text: {
+        type: String,
+        trim: true
       }
     }
   ]
